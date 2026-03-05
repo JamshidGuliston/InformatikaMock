@@ -1,0 +1,128 @@
+<div class="min-h-screen bg-gradient-to-br from-primary-950 via-primary-900 to-indigo-900 flex items-center justify-center p-4">
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 right-1/4 w-64 h-64 bg-primary-500 rounded-full blur-3xl opacity-10 animate-pulse-slow"></div>
+    <div class="absolute bottom-1/3 left-1/4 w-96 h-96 bg-indigo-500 rounded-full blur-3xl opacity-10 animate-pulse-slow"></div>
+  </div>
+
+  <div class="relative w-full max-w-md animate-slide-up">
+    <!-- Logo -->
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-600 shadow-2xl mb-3">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-white">Ro'yxatga olish</h1>
+      <p class="text-primary-300 text-sm mt-1">InformatikaMock platformasiga qo'shiling</p>
+    </div>
+
+    <div class="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-7 shadow-2xl">
+
+      @if (error()) {
+        <div class="mb-4 p-3 rounded-xl bg-danger-500/20 border border-danger-500/30 flex items-center gap-2 animate-fade-in">
+          <svg class="w-4 h-4 text-danger-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <p class="text-danger-300 text-sm">{{ error() }}</p>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+        <!-- Full name -->
+        <div>
+          <label class="block text-sm font-medium text-primary-200 mb-1.5">Ism Familiya</label>
+          <input
+            type="text"
+            formControlName="full_name"
+            placeholder="Ism Familiyangiz"
+            class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40
+                   focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all"
+          />
+          @if (form.get('full_name')?.invalid && form.get('full_name')?.touched) {
+            <p class="mt-1 text-xs text-danger-400">Kamida 3 ta belgi kiriting</p>
+          }
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-primary-200 mb-1.5">Email manzil</label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="email@example.com"
+            class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40
+                   focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all"
+          />
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <p class="mt-1 text-xs text-danger-400">To'g'ri email kiriting</p>
+          }
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-medium text-primary-200 mb-1.5">Parol</label>
+          <div class="relative">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+              class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40
+                     focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all pr-12"
+            />
+            <button type="button" (click)="togglePassword()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+          @if (form.get('password')?.invalid && form.get('password')?.touched) {
+            <p class="mt-1 text-xs text-danger-400">Parol kamida 6 ta belgi bo'lishi kerak</p>
+          }
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+          <label class="block text-sm font-medium text-primary-200 mb-1.5">Parolni tasdiqlang</label>
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            placeholder="••••••••"
+            class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40
+                   focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all"
+          />
+          @if (passwordMismatch) {
+            <p class="mt-1 text-xs text-danger-400">Parollar mos kelmadi</p>
+          }
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full py-3 px-4 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-semibold
+                 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed
+                 focus:outline-none focus:ring-2 focus:ring-primary-400 shadow-lg mt-2"
+        >
+          @if (loading()) {
+            <span class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              Ro'yxatdan o'tilmoqda...
+            </span>
+          } @else {
+            Ro'yxatdan o'tish
+          }
+        </button>
+      </form>
+
+      <p class="mt-5 text-center text-sm text-primary-400">
+        Hisobingiz bormi?
+        <a routerLink="/login" class="text-primary-300 hover:text-white font-medium transition-colors">Kirish</a>
+      </p>
+    </div>
+  </div>
+</div>

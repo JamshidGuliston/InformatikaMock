@@ -1,0 +1,129 @@
+<div class="min-h-screen bg-gray-100 flex">
+
+  <!-- Sidebar -->
+  <aside
+    class="flex flex-col bg-gray-900 text-white transition-all duration-300 shrink-0"
+    [class]="sidebarOpen() ? 'w-60' : 'w-16'"
+  >
+    <!-- Logo -->
+    <div class="flex items-center gap-3 h-16 px-4 border-b border-gray-800">
+      <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
+        </svg>
+      </div>
+      @if (sidebarOpen()) {
+        <span class="font-bold text-sm whitespace-nowrap">Admin Panel</span>
+      }
+    </div>
+
+    <!-- Nav items -->
+    <nav class="flex-1 py-4 space-y-1 px-2">
+      @for (item of navItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="bg-primary-600 text-white"
+          [routerLinkActiveOptions]="{ exact: false }"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition-all text-sm font-medium"
+        >
+          @if (item.icon === 'chart') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          }
+          @if (item.icon === 'book') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          }
+          @if (item.icon === 'users') {
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          }
+          @if (sidebarOpen()) {
+            <span class="whitespace-nowrap">{{ item.label }}</span>
+          }
+        </a>
+      }
+    </nav>
+
+    <!-- Student portal link -->
+    @if (sidebarOpen()) {
+      <div class="px-2 pb-2">
+        <button
+          (click)="goToStudentPortal()"
+          class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-all text-xs"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Student portali
+        </button>
+      </div>
+    }
+
+    <!-- User info + logout -->
+    <div class="border-t border-gray-800 p-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-primary-600/30 border border-primary-500/30 flex items-center justify-center shrink-0">
+          <span class="text-primary-300 text-xs font-bold">{{ auth.teacher()?.full_name?.at(0) }}</span>
+        </div>
+        @if (sidebarOpen()) {
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-xs font-medium truncate">{{ auth.teacher()?.full_name }}</p>
+            <p class="text-gray-500 text-xs truncate">O'qituvchi</p>
+          </div>
+          <button (click)="logout()" class="text-gray-500 hover:text-danger-400 transition-colors shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        }
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <!-- Top bar -->
+    <header class="bg-white border-b border-gray-200 h-16 flex items-center px-4 gap-3 shrink-0 min-w-0">
+      <button
+        (click)="toggleSidebar()"
+        class="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-1 min-w-0 flex-1 overflow-hidden">
+        @for (item of breadcrumb.items(); track $index; let last = $last) {
+          @if ($index > 0) {
+            <svg class="w-3.5 h-3.5 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          }
+          @if (!last && item.route) {
+            <a
+              [routerLink]="item.route"
+              [title]="item.label"
+              class="text-gray-400 hover:text-primary-600 text-sm transition-colors shrink-0 max-w-[9rem] truncate"
+            >{{ item.label }}</a>
+          } @else if (!last) {
+            <span [title]="item.label" class="text-gray-400 text-sm shrink-0 max-w-[9rem] truncate">{{ item.label }}</span>
+          } @else {
+            <span [title]="item.label" class="text-gray-800 font-semibold text-sm truncate min-w-0">{{ item.label }}</span>
+          }
+        }
+      </nav>
+    </header>
+
+    <!-- Page content -->
+    <main class="flex-1 overflow-auto p-6 bg-gray-50">
+      <router-outlet />
+    </main>
+  </div>
+</div>

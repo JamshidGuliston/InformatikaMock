@@ -1,0 +1,157 @@
+<div class="min-h-screen bg-gray-950">
+
+  <!-- Header -->
+  <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 h-16 flex items-center gap-3">
+      <a routerLink="/dashboard" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
+      <div class="w-px h-5 bg-gray-700"></div>
+      <span class="text-gray-300 text-sm truncate">{{ module()?.title }}</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+
+    @if (loading()) {
+      <div class="animate-pulse space-y-4">
+        <div class="h-8 bg-gray-800 rounded w-2/3"></div>
+        <div class="h-4 bg-gray-800 rounded w-full"></div>
+        <div class="h-4 bg-gray-800 rounded w-3/4"></div>
+        <div class="mt-6 space-y-3">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="h-20 bg-gray-900 rounded-2xl border border-gray-800"></div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (!loading() && module()) {
+      <!-- Module header -->
+      <div class="mb-8 animate-fade-in">
+        <h1 class="text-2xl font-bold text-white">{{ module()!.title }}</h1>
+        @if (module()!.description) {
+          <p class="text-gray-400 mt-2">{{ module()!.description }}</p>
+        }
+
+        @if (enrollment()) {
+          <div class="mt-4 bg-gray-900 rounded-xl border border-gray-800 p-4">
+            <div class="flex justify-between text-sm mb-2">
+              <span class="text-gray-400">Modul progressi</span>
+              <span class="text-white font-medium">{{ enrollment()!.progress_percent }}%</span>
+            </div>
+            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full bg-primary-500 transition-all duration-700"
+                [style.width.%]="enrollment()!.progress_percent"
+              ></div>
+            </div>
+          </div>
+        }
+
+        @if (module()!.is_sequential) {
+          <div class="mt-3 flex items-center gap-2 text-sm text-primary-400 bg-primary-500/10 border border-primary-500/20 rounded-xl px-4 py-2.5">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Bu modul ketma-ket tartibda o'tiladi. Har bir darsni belgilangan foizda bajarib, keyingisiga o'ting.
+          </div>
+        }
+      </div>
+
+      <!-- Lessons list -->
+      <div class="space-y-3 animate-slide-up">
+        <h2 class="text-lg font-semibold text-white mb-4">Darslar ({{ lessons().length }})</h2>
+
+        @for (lesson of lessons(); track lesson.id; let i = $index) {
+          @if (lesson.isLocked) {
+            <div class="bg-gray-900/50 rounded-2xl border border-gray-800 p-5 opacity-60 cursor-not-allowed">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-2">
+                    <h3 class="font-medium text-gray-500">{{ lesson.title }}</h3>
+                    <span class="text-xs px-2 py-1 rounded-full border shrink-0" [class]="getStatusClass(lesson)">
+                      {{ getStatusLabel(lesson) }}
+                    </span>
+                  </div>
+                  @if (lesson.description) {
+                    <p class="text-gray-600 text-sm mt-1 line-clamp-1">{{ lesson.description }}</p>
+                  }
+                  <p class="text-xs text-gray-600 mt-2">Oldingi darsni {{ lessons()[i-1].required_completion_percent }}% bajarganingizdan keyin ochiladi</p>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <a
+              [routerLink]="['/lessons', lesson.id]"
+              (click)="enrollAndStart(lesson.id)"
+              class="group block bg-gray-900 hover:bg-gray-800 rounded-2xl border border-gray-800
+                     hover:border-primary-500/40 p-5 transition-all duration-200"
+            >
+              <div class="flex items-start gap-4">
+                <!-- Lesson number / check -->
+                <div class="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center text-sm font-bold transition-colors"
+                  [class]="(lesson.progress?.completion_percent ?? 0) >= lesson.required_completion_percent
+                    ? 'bg-success-500/20 border border-success-500/30 text-success-400'
+                    : 'bg-primary-600/20 border border-primary-500/30 text-primary-400 group-hover:bg-primary-600/30'"
+                >
+                  @if ((lesson.progress?.completion_percent ?? 0) >= lesson.required_completion_percent) {
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  } @else {
+                    {{ i + 1 }}
+                  }
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-2">
+                    <h3 class="font-semibold text-white group-hover:text-primary-300 transition-colors truncate">
+                      {{ lesson.title }}
+                    </h3>
+                    <span class="text-xs px-2 py-1 rounded-full border shrink-0" [class]="getStatusClass(lesson)">
+                      {{ getStatusLabel(lesson) }}
+                    </span>
+                  </div>
+                  @if (lesson.description) {
+                    <p class="text-gray-500 text-sm mt-1 line-clamp-1">{{ lesson.description }}</p>
+                  }
+
+                  <!-- Progress bar for in-progress lessons -->
+                  @if (lesson.progress && lesson.progress.completion_percent > 0 &&
+                       lesson.progress.completion_percent < lesson.required_completion_percent) {
+                    <div class="mt-2">
+                      <div class="h-1 bg-gray-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-warning-500 rounded-full transition-all duration-500"
+                             [style.width.%]="lesson.progress.completion_percent"></div>
+                      </div>
+                    </div>
+                  }
+
+                  <div class="flex items-center gap-3 mt-2">
+                    <span class="text-xs text-gray-600">
+                      O'tish uchun: {{ lesson.required_completion_percent }}%
+                    </span>
+                  </div>
+                </div>
+
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-primary-400 group-hover:translate-x-1 transition-all shrink-0 mt-1"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </a>
+          }
+        }
+      </div>
+    }
+  </main>
+</div>

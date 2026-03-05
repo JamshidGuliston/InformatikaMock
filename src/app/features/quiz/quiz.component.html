@@ -1,0 +1,305 @@
+<div class="min-h-screen bg-gray-950 flex flex-col">
+
+  <!-- Confirm dialog -->
+  @if (showConfirm()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div class="bg-gray-900 border border-gray-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl animate-slide-up">
+        <h3 class="text-white font-bold text-lg">Testni yakunlash</h3>
+        <p class="text-gray-400 mt-2 text-sm">
+          {{ answeredCount() }} / {{ questions().length }} savol javoblandi.
+          @if (answeredCount() < questions().length) {
+            <span class="text-warning-400">{{ questions().length - answeredCount() }} ta savol javobsiz qoldi.</span>
+          }
+        </p>
+        <p class="text-gray-400 text-sm mt-1">Testni yakunlashni tasdiqlaysizmi?</p>
+        <div class="flex gap-3 mt-5">
+          <button
+            (click)="cancelSubmit()"
+            class="flex-1 py-2.5 rounded-xl border border-gray-700 text-gray-300 hover:bg-gray-800 transition-colors text-sm font-medium"
+          >
+            Bekor qilish
+          </button>
+          <button
+            (click)="submitQuiz()"
+            class="flex-1 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white transition-colors text-sm font-medium"
+          >
+            Yakunlash
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="flex-1 flex items-center justify-center">
+      <div class="text-center">
+        <svg class="w-8 h-8 animate-spin text-primary-400 mx-auto" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <p class="text-gray-500 mt-3 text-sm">Yuklanmoqda...</p>
+      </div>
+    </div>
+  }
+
+  @if (!loading() && assignment()) {
+    <!-- Quiz Header -->
+    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-30">
+      <div class="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
+        <button onclick="history.back()" class="text-gray-400 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div class="flex-1 min-w-0">
+          <h1 class="text-white font-medium text-sm truncate">{{ assignment()!.title }}</h1>
+        </div>
+
+        <!-- Timer -->
+        @if (assignment()!.time_limit) {
+          <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-sm font-mono font-bold"
+               [class]="isTimeLow() ? 'bg-danger-500/20 border-danger-500/30 text-danger-400 animate-pulse' : 'bg-gray-800 border-gray-700 text-white'">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {{ formatTime(timeLeft()) }}
+          </div>
+        }
+
+        <!-- Progress -->
+        <span class="text-xs text-gray-500">{{ answeredCount() }}/{{ questions().length }}</span>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="h-1 bg-gray-800">
+        <div class="h-full bg-primary-500 transition-all duration-300"
+             [style.width.%]="(answeredCount() / questions().length) * 100"></div>
+      </div>
+    </header>
+
+    <div class="flex-1 max-w-4xl mx-auto w-full px-4 py-6 flex flex-col gap-4">
+
+      <!-- Question navigator -->
+      <div class="flex flex-wrap gap-1.5">
+        @for (q of questions(); track q.id; let i = $index) {
+          <button
+            (click)="goto(i)"
+            class="w-8 h-8 rounded-lg text-xs font-medium transition-all duration-150"
+            [class]="currentIdx() === i
+              ? 'bg-primary-600 text-white scale-110'
+              : isAnswered(q.id)
+                ? 'bg-success-500/20 border border-success-500/30 text-success-400'
+                : 'bg-gray-800 border border-gray-700 text-gray-400 hover:border-gray-600'"
+          >
+            {{ i + 1 }}
+          </button>
+        }
+      </div>
+
+      <!-- Current question -->
+      @let q = questions()[currentIdx()];
+      @if (q) {
+        <div class="flex-1 bg-gray-900 rounded-2xl border border-gray-800 p-6 animate-fade-in">
+          <!-- Question header -->
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs text-primary-400 bg-primary-500/10 border border-primary-500/20 px-2.5 py-1 rounded-full">
+              Savol {{ currentIdx() + 1 }} / {{ questions().length }}
+            </span>
+            <span class="text-xs text-gray-500">{{ q.points }} ball</span>
+          </div>
+
+          <!-- Question text -->
+          <p class="text-white font-medium text-lg leading-relaxed mb-6">{{ q.question_text }}</p>
+
+          <!-- Answer area based on question_data structure -->
+          @let qKind = getQuestionKind(q);
+
+          <!-- MULTIPLE CHOICE (bitta to'g'ri javob) -->
+          @if (qKind === 'multiple_choice') {
+            <div class="space-y-2.5">
+              @for (option of getOptions(q); track option; let oi = $index) {
+                <button
+                  (click)="setAnswer(q.id, option)"
+                  class="w-full text-left px-4 py-3.5 rounded-xl border transition-all duration-150 flex items-center gap-3"
+                  [class]="isSelected(q.id, option)
+                    ? 'bg-primary-600/20 border-primary-500 text-white'
+                    : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600 hover:bg-gray-700'"
+                >
+                  <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 text-xs transition-all"
+                        [class]="isSelected(q.id, option)
+                          ? 'border-primary-400 bg-primary-500 text-white'
+                          : 'border-gray-600 text-gray-600'">
+                    @if (isSelected(q.id, option)) {
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    } @else {
+                      {{ 'ABCDEFGHIJ'[oi] }}
+                    }
+                  </span>
+                  <span class="text-sm">{{ option }}</span>
+                </button>
+              }
+            </div>
+          }
+
+          <!-- TRUE/FALSE -->
+          @if (qKind === 'true_false') {
+            <div class="grid grid-cols-2 gap-3">
+              @for (opt of [['true', "Ha / To'g'ri", '✓'], ['false', "Yo'q / Noto'g'ri", '✗']]; track opt[0]) {
+                <button
+                  (click)="setAnswer(q.id, opt[0])"
+                  class="py-6 rounded-xl border-2 transition-all duration-150 flex flex-col items-center gap-2 text-2xl"
+                  [class]="getAnswer(q.id) === opt[0]
+                    ? (opt[0] === 'true' ? 'bg-success-500/20 border-success-500 text-success-400' : 'bg-danger-500/20 border-danger-500 text-danger-400')
+                    : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600'"
+                >
+                  {{ opt[2] }}
+                  <span class="text-sm font-medium">{{ opt[1] }}</span>
+                </button>
+              }
+            </div>
+          }
+
+          <!-- FILL IN THE BLANK -->
+          @if (qKind === 'fill_blank') {
+            <div>
+              <input
+                type="text"
+                [value]="getAnswer(q.id) ?? ''"
+                (input)="setAnswer(q.id, $any($event.target).value)"
+                placeholder="Javobingizni yozing..."
+                class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white
+                       placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          }
+
+          <!-- TEXT ANSWER -->
+          @if (qKind === 'text') {
+            <textarea
+              [value]="getAnswer(q.id) ?? ''"
+              (input)="setAnswer(q.id, $any($event.target).value)"
+              placeholder="Javobingizni yozing..."
+              rows="4"
+              class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white resize-none
+                     placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            ></textarea>
+          }
+
+          <!-- MATCHING -->
+          @if (qKind === 'matching') {
+            <div class="space-y-3">
+              @for (pair of getMatchingPairs(q); track pair.left) {
+                <div class="flex items-center gap-3">
+                  <div class="flex-1 px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-gray-300 text-sm">
+                    {{ pair.left }}
+                  </div>
+                  <svg class="w-4 h-4 text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                  <select
+                    [value]="getMatchingAnswer(q.id, pair.left)"
+                    (change)="setMatchingAnswer(q.id, pair.left, $any($event.target).value)"
+                    class="flex-1 px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white
+                           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                  >
+                    <option value="" class="bg-gray-900">-- Tanlang --</option>
+                    @for (right of getRightOptions(q); track right) {
+                      <option [value]="right" class="bg-gray-900">{{ right }}</option>
+                    }
+                  </select>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- ORDERING -->
+          @if (qKind === 'ordering') {
+            <div class="space-y-2">
+              <p class="text-xs text-gray-500 mb-3">Elementlarni to'g'ri tartibga keltirib, yuqori/pastga ko'chiring:</p>
+              @for (item of getOrderingAnswer(q.id); track item; let oi = $index) {
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-600 w-5 text-center">{{ oi + 1 }}.</span>
+                  <div class="flex-1 px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-gray-300 text-sm">
+                    {{ item }}
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <button
+                      (click)="moveOrderItem(q.id, oi, oi - 1)"
+                      [disabled]="oi === 0"
+                      class="w-6 h-6 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-30 flex items-center justify-center"
+                    >
+                      <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                      </svg>
+                    </button>
+                    <button
+                      (click)="moveOrderItem(q.id, oi, oi + 1)"
+                      [disabled]="oi === getOrderingAnswer(q.id).length - 1"
+                      class="w-6 h-6 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-30 flex items-center justify-center"
+                    >
+                      <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Navigation -->
+      <div class="flex items-center gap-3">
+        <button
+          (click)="prev()"
+          [disabled]="currentIdx() === 0"
+          class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-700 text-gray-300
+                 hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Oldingi
+        </button>
+
+        <div class="flex-1"></div>
+
+        @if (currentIdx() < questions().length - 1) {
+          <button
+            (click)="next()"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white
+                   transition-colors text-sm font-medium"
+          >
+            Keyingi
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        } @else {
+          <button
+            (click)="confirmSubmit()"
+            [disabled]="submitting()"
+            class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-success-600 hover:bg-success-500 text-white
+                   transition-colors text-sm font-bold disabled:opacity-60"
+          >
+            @if (submitting()) {
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              Saqlanmoqda...
+            } @else {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Yakunlash
+            }
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

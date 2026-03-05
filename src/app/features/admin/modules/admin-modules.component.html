@@ -1,0 +1,126 @@
+<div class="space-y-5">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold text-gray-800">Modullar</h2>
+      <p class="text-gray-500 text-sm mt-0.5">Kurs modullarini boshqaring</p>
+    </div>
+    <button (click)="toggleForm()"
+      class="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-all">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Yangi modul
+    </button>
+  </div>
+
+  <!-- Create form -->
+  @if (showForm()) {
+    <div class="bg-white rounded-2xl border border-primary-200 p-5 shadow-sm animate-fade-in">
+      <h3 class="font-semibold text-gray-700 mb-4">Yangi modul qo'shish</h3>
+
+      @if (error()) {
+        <div class="mb-3 p-3 rounded-xl bg-danger-50 border border-danger-200 text-danger-700 text-sm">{{ error() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="create()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Nomi *</label>
+          <input type="text" formControlName="title" placeholder="Modul nomi"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-400 text-sm" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Tavsif</label>
+          <textarea formControlName="description" rows="2" placeholder="Modul haqida qisqacha..."
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-400 text-sm resize-none"></textarea>
+        </div>
+        <div class="flex items-center gap-6">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" formControlName="is_sequential" class="w-4 h-4 rounded text-primary-600" />
+            <span class="text-sm text-gray-600">Ketma-ket (tartibli)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" formControlName="is_published" class="w-4 h-4 rounded text-primary-600" />
+            <span class="text-sm text-gray-600">Chiqarilgan</span>
+          </label>
+        </div>
+        <div class="flex gap-3 pt-1">
+          <button type="submit" [disabled]="form.invalid || saving()"
+            class="px-5 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-all disabled:opacity-60">
+            {{ saving() ? 'Saqlanmoqda...' : 'Saqlash' }}
+          </button>
+          <button type="button" (click)="toggleForm()"
+            class="px-5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium transition-all">
+            Bekor qilish
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Table -->
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+    @if (loading()) {
+      <div class="flex items-center justify-center h-40">
+        <svg class="w-7 h-7 animate-spin text-primary-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+    } @else if (modules().length === 0) {
+      <div class="py-16 text-center text-gray-400">
+        <svg class="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        <p class="text-sm">Hali modullar mavjud emas</p>
+      </div>
+    } @else {
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-gray-100">
+            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Nomi</th>
+            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Tartib</th>
+            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Holat</th>
+            <th class="px-5 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (mod of modules(); track mod.id) {
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-3.5">
+                <p class="font-medium text-gray-800 text-sm">{{ mod.title }}</p>
+                @if (mod.description) {
+                  <p class="text-gray-400 text-xs truncate max-w-xs mt-0.5">{{ mod.description }}</p>
+                }
+              </td>
+              <td class="px-5 py-3.5 text-sm text-gray-500">{{ mod.order_index }}</td>
+              <td class="px-5 py-3.5">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium"
+                  [class]="mod.is_published ? 'bg-success-50 text-success-700' : 'bg-gray-100 text-gray-500'">
+                  {{ mod.is_published ? 'Chiqarilgan' : 'Qoralama' }}
+                </span>
+              </td>
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2 justify-end">
+                  <button (click)="edit(mod)"
+                    class="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button (click)="delete(mod)"
+                    class="p-1.5 rounded-lg text-gray-400 hover:text-danger-600 hover:bg-danger-50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

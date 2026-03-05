@@ -1,0 +1,131 @@
+PS D:\Proekt\Angular\TeacherModuls\InformatikaMock> ng build
+PS D:\Proekt\Angular\TeacherModuls\InformatikaMock> ng build
+Initial chunk files | Names                           |  Raw size | Estimated transfer size
+chunk-UOKYWY4H.js   | -                               | 179.61 kB |                52.41 kB
+chunk-U6CBZKW4.js   | -                               |  88.58 kB |                22.42 kB
+styles-3R7TUXBE.css | styles                          |  57.46 kB |                 8.30 kB
+main-ZXERNBMQ.js    | main                            |   2.78 kB |               777 bytes
+chunk-DAQOROHW.js   | -                               |   1.13 kB |               491 bytes
+chunk-GB3BGZ5F.js   | -                               | 877 bytes |               877 bytes
+chunk-RCIQ5MNV.js   | -                               | 807 bytes |               807 bytes
+
+                    | Initial total                   | 331.24 kB |                86.08 kB
+
+Lazy chunk files    | Names                           |  Raw size | Estimated transfer size
+chunk-7UEHW4O2.js   | ngx-quill-quill-CUw8Q_m0        | 204.67 kB |                51.69 kB
+chunk-QU6POHYQ.js   | -                               |  42.57 kB |                 8.70 kB
+chunk-34L2Y2GC.js   | admin-lesson-edit-component     |  34.20 kB |                 8.54 kB
+chunk-6NIUDHWT.js   | admin-assignment-edit-component |  27.24 kB |                 6.54 kB
+chunk-XWD6JTZW.js   | quiz-component                  |  20.64 kB |                 5.50 kB
+chunk-UK36RQG4.js   | results-component               |  15.75 kB |                 4.71 kB
+chunk-DH42MDAO.js   | lesson-detail-component         |  12.62 kB |                 3.66 kB
+chunk-OB6QO2IU.js   | admin-module-edit-component     |  12.01 kB |                 3.29 kB
+chunk-TQONXTNN.js   | module-detail-component         |   9.74 kB |                 3.03 kB
+chunk-LJXQMPZT.js   | dashboard-component             |   9.61 kB |                 2.96 kB
+chunk-7X3SPOGW.js   | admin-modules-component         |   8.59 kB |                 2.86 kB
+chunk-JZSB45PB.js   | register-component              |   7.90 kB |                 2.58 kB
+chunk-T45MBDMP.js   | admin-students-component        |   7.60 kB |                 2.59 kB
+chunk-E4QXLYJD.js   | admin-layout-component          |   7.46 kB |                 2.28 kB
+chunk-CJNPTOYG.js   | login-component                 |   7.42 kB |                 2.58 kB
+...and 7 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [48.624 seconds] - 2026-03-04T13:21:56.002Z
+
+▲ [WARNING] NG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107 [plugin angular-compiler]
+
+    src/app/features/admin/lesson-edit/admin-lesson-edit.component.html:161:70:
+      161 │ ...  <p class="text-xs text-gray-400">{{ c.content_type?.name }}</p>
+          ╵                                                          ~~~~
+
+  Warning occurs in the template of component AdminLessonEditComponent.
+
+    src/app/features/admin/lesson-edit/admin-lesson-edit.component.ts:16:15:
+      16 │   templateUrl: './admin-lesson-edit.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107 [plugin angular-compiler]
+
+    src/app/features/admin/lesson-edit/admin-lesson-edit.component.html:265:73:
+      265 │ ...y-400">{{ a.assignment_type?.name }} · {{ a.total_points }} b...
+          ╵                                 ~~~~
+
+  Warning occurs in the template of component AdminLessonEditComponent.
+
+    src/app/features/admin/lesson-edit/admin-lesson-edit.component.ts:16:15:
+      16 │   templateUrl: './admin-lesson-edit.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107 [plugin angular-compiler]
+
+    src/app/features/admin/students/admin-students.component.html:91:91:
+      91 │ ...imary-700 text-xs font-bold">{{ student.full_name?.at(0) }}</span>
+         ╵                                                       ~~
+
+  Warning occurs in the template of component AdminStudentsComponent.
+
+    src/app/features/admin/students/admin-students.component.ts:12:15:
+      12 │   templateUrl: './admin-students.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107 [plugin angular-compiler]
+
+    src/app/features/lesson-detail/lesson-detail.component.html:85:66:
+      85 │ ...      @switch (getContentIcon(content.content_type?.name ?? '')) {
+         ╵                                                        ~~~~
+
+  Warning occurs in the template of component LessonDetailComponent.
+
+    src/app/features/lesson-detail/lesson-detail.component.ts:15:15:
+      15 │   templateUrl: './lesson-detail.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8107: NG8107: The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore the '?.' operator can be replaced with the '.' operator. Find more at https://v21.angular.dev/extended-diagnostics/NG8107 [plugin angular-compiler]
+
+    src/app/features/lesson-detail/lesson-detail.component.html:105:47:
+      105 │                     @if (content.content_type?.name) {
+          ╵                                                ~~~~
+
+  Warning occurs in the template of component LessonDetailComponent.
+
+    src/app/features/lesson-detail/lesson-detail.component.ts:15:15:
+      15 │   templateUrl: './lesson-detail.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8102: NG8102: The left side of this nullish coalescing operation does not include 'null' or 'undefined' in its type, therefore the '??' operator can be safely removed. Find more at https://v21.angular.dev/extended-diagnostics/NG8102 [plugin angular-compiler]  
+
+    src/app/features/module-detail/module-detail.component.html:129:43:
+      129 │ ...sson.progress && (lesson.progress.completion_percent ?? 0) > 0 &&
+          ╵                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Warning occurs in the template of component ModuleDetailComponent.
+
+    src/app/features/module-detail/module-detail.component.ts:18:15:
+      18 │   templateUrl: './module-detail.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] NG8102: NG8102: The left side of this nullish coalescing operation does not include 'null' or 'undefined' in its type, therefore the '??' operator can be safely removed. Find more at https://v21.angular.dev/extended-diagnostics/NG8102 [plugin angular-compiler]  
+
+    src/app/features/module-detail/module-detail.component.html:130:24:
+      130 │ ...           (lesson.progress.completion_percent ?? 0) < lesson....
+          ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Warning occurs in the template of component ModuleDetailComponent.
+
+    src/app/features/module-detail/module-detail.component.ts:18:15:
+      18 │   templateUrl: './module-detail.component.html',
+         ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+▲ [WARNING] Module 'quill-delta' used by 'node_modules/quill/core.js' is not ESM
+
+  CommonJS or AMD dependencies can cause optimization bailouts.
+  For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies
+
+
+Output location: D:\Proekt\Angular\TeacherModuls\Informat
